@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>桜李祭版 MBTI｜適性部署診断</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: linear-gradient(135deg, #fff5f7 0%, #f8fafc 45%, #f0f9ff 100%);
+      min-height: 100vh;
+      color: #1e293b;
+    }
+    .sakura-gradient {
+      background: linear-gradient(135deg, #ec4899 0%, #f43f5e 55%, #fb7185 100%);
+    }
+    .card-shadow {
+      box-shadow: 0 10px 30px -5px rgba(236, 72, 153, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+    }
+    .fade-in {
+      animation: fadeIn 0.35s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* カスタムレンジスライダー */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ec4899;
+      cursor: pointer;
+      border: 3px solid #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+    }
+    /* 部署一覧モーダルのカテゴリータブ拡張スタイル */
+    .dept-filter-btn {
+      min-height: 54px;
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      border-radius: 14px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+      border: 2px solid transparent;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-pink-200 selection:text-pink-900">
+
+  <!-- ヘッダー -->
+  <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-pink-100">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <button onclick="goHome()" class="flex items-center gap-2.5 text-left group">
+        <span class="w-9 h-9 rounded-xl sakura-gradient text-white flex items-center justify-center font-black text-lg shadow-sm group-hover:scale-105 transition">桜</span>
+        <div>
+          <p class="text-[11px] font-bold text-pink-500 tracking-wider">OURISAI DEPT. MBTI</p>
+          <h1 class="text-sm sm:text-base font-black text-slate-800 leading-tight">桜李祭版 MBTI｜適性部署診断</h1>
+        </div>
+      </button>
+      <div class="flex items-center gap-2">
+        <button onclick="openDeptModal()" class="px-3 py-2 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border border-pink-200">
+          <span>📋</span>
+          <span>全21部署＆3PJ一覧</span>
+        </button>
+        <button onclick="openTypesModal()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold transition">
+          性格指標一覧
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-6 sm:py-10">
+
+    <!-- 1. トップ画面 -->
+    <section id="homeScreen" class="fade-in space-y-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-10 card-shadow border border-pink-100 text-center relative overflow-hidden">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 text-pink-600 text-xs font-bold mb-4 border border-pink-200">
+          <span>🌸 桜美林大学 桜李祭実行委員会</span>
+          <span>×</span>
+          <span>4軸行動バランス分析</span>
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-black text-slate-900 leading-snug mb-3">
+          桜李祭版 MBTI<br />
+          <span class="text-transparent bg-clip-text sakura-gradient">「適性部署＆性格バランス」</span>診断
+        </h2>
+        <p class="text-sm sm:text-base text-slate-600 max-w-xl mx-auto leading-relaxed mb-7">
+          4つの行動スタイルの<strong>パーセンテージ比率</strong>から、全21部署＋3プロジェクトとの適合度を精密計算！<br />
+          質問は日常のチーム行動ベースなので、<strong>桜李祭を知らない人</strong>でもMBTI感覚で楽しめます。
+        </p>
+
+        <!-- STEP 1: 立場選択 -->
+        <div class="max-w-xl mx-auto text-left mb-6">
+          <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2.5">
+            STEP 1：あなたの立場を選んでください
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" id="roleSelector">
+            <button type="button" onclick="selectRole('general')" data-role="general"
+              class="role-btn p-3.5 rounded-2xl border-2 border-pink-500 bg-pink-50/70 text-left transition">
+              <div class="text-lg mb-1">🎪</div>
+              <div class="font-bold text-sm text-slate-900">一般・イベント好き</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">他大生・高校生・来場者もOK</div>
+            </button>
+            <button type="button" onclick="selectRole('obirin')" data-role="obirin"
+              class="role-btn p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-pink-300 text-left transition">
+              <div class="text-lg mb-1">🌸</div>
+              <div class="font-bold text-sm text-slate-900">桜美林生・新入生</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">入部・部署選びの参考に</div>
+            </button>
+            <button type="button" onclick="selectRole('member')" data-role="member"
+              class="role-btn p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-pink-300 text-left transition">
+              <div class="text-lg mb-1">🔥</div>
+              <div class="font-bold text-sm text-slate-900">現役 桜李祭実行委員</div>
+              <div class="text-[11px] text-slate-500 mt-0.5">自分の部署や兼任PJと比較</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: 質問数コース選択 -->
+        <div class="max-w-xl mx-auto text-left mb-8">
+          <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2.5">
+            STEP 2：診断コースを選んでスタート
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button onclick="startQuiz(12)"
+              class="group p-5 rounded-2xl border-2 border-pink-200 bg-gradient-to-br from-white to-pink-50/60 hover:border-pink-500 hover:shadow-md text-left transition">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 text-xs font-black">所要時間 約1分</span>
+                <span class="text-pink-500 font-bold group-hover:translate-x-1 transition">→</span>
+              </div>
+              <div class="text-lg font-black text-slate-900">⚡ サクッと診断（全12問）</div>
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                各軸3問ずつの厳選質問。SNSシェアや新歓ブースでの体験にぴったり！
+              </p>
+            </button>
+
+            <button onclick="startQuiz(40)"
+              class="group p-5 rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50/60 hover:border-indigo-500 hover:shadow-md text-left transition">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-black">高精度・詳細版</span>
+                <span class="text-indigo-500 font-bold group-hover:translate-x-1 transition">→</span>
+              </div>
+              <div class="text-lg font-black text-slate-900">🔬 じっくり精密診断（全40問）</div>
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                各軸10問ずつの多角的な質問で、細かなパーセンテージと部署適合度を徹底分析！
+              </p>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4つの指標の解説 -->
+        <div class="max-w-xl mx-auto pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-left">
+          <div class="p-3 rounded-xl bg-slate-50">
+            <div class="text-[11px] font-black text-pink-600">指標1：立ち位置</div>
+            <div class="text-xs font-bold text-slate-800 mt-0.5">P 表舞台 / B 裏方</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50">
+            <div class="text-[11px] font-black text-amber-600">指標2：得意な武器</div>
+            <div class="text-xs font-bold text-slate-800 mt-0.5">C 創造 / O 運営</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50">
+            <div class="text-[11px] font-black text-sky-600">指標3：判断基準</div>
+            <div class="text-xs font-bold text-slate-800 mt-0.5">L 論理 / E 熱量</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50">
+            <div class="text-[11px] font-black text-emerald-600">指標4：動き方</div>
+            <div class="text-xs font-bold text-slate-800 mt-0.5">S 計画 / F 瞬発</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 質問画面 -->
+    <section id="quizScreen" class="hidden fade-in space-y-5">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-pink-100">
+        <!-- 進捗バー -->
+        <div class="flex items-center justify-between text-xs font-bold text-slate-500 mb-2">
+          <span id="quizAxisBadge" class="px-2.5 py-1 rounded-full bg-pink-50 text-pink-600">指標1：立ち位置</span>
+          <span id="quizProgressText">1 / 12</span>
+        </div>
+        <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mb-6">
+          <div id="quizProgressBar" class="h-full sakura-gradient transition-all duration-300" style="width: 8%;"></div>
+        </div>
+
+        <!-- 質問シチュエーション -->
+        <div class="mb-6">
+          <p class="text-xs font-bold text-slate-400 mb-1">Q<span id="questionNumber">1</span>. 次のうち、あなたの普段の行動や考え方に近いのはどちらですか？</p>
+          <h3 id="questionSituation" class="text-lg sm:text-xl font-black text-slate-900 leading-snug">
+            シチュエーション文
+          </h3>
+        </div>
+
+        <!-- A / B 比較カード -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-6">
+          <div class="p-4 rounded-2xl bg-pink-50/70 border border-pink-200">
+            <span class="inline-block px-2 py-0.5 rounded bg-pink-500 text-white text-[11px] font-black mb-1.5">Aのスタンス</span>
+            <p id="optionAText" class="text-sm sm:text-base font-bold text-slate-800 leading-relaxed"></p>
+          </div>
+          <div class="p-4 rounded-2xl bg-sky-50/70 border border-sky-200">
+            <span class="inline-block px-2 py-0.5 rounded bg-sky-500 text-white text-[11px] font-black mb-1.5">Bのスタンス</span>
+            <p id="optionBText" class="text-sm sm:text-base font-bold text-slate-800 leading-relaxed"></p>
+          </div>
+        </div>
+
+        <!-- 4段階回答ボタン -->
+        <div class="space-y-2.5">
+          <button onclick="answerQuestion(3)" class="w-full py-3.5 px-4 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-sm sm:text-base shadow-sm transition flex items-center justify-between">
+            <span>Aにとても当てはまる</span>
+            <span class="text-xs opacity-80">＋＋</span>
+          </button>
+          <button onclick="answerQuestion(2)" class="w-full py-3.5 px-4 rounded-2xl bg-pink-100 hover:bg-pink-200 text-pink-900 font-bold text-sm sm:text-base transition flex items-center justify-between">
+            <span>どちらかといえばAに近い</span>
+            <span class="text-xs opacity-70">＋</span>
+          </button>
+          <button onclick="answerQuestion(1)" class="w-full py-3.5 px-4 rounded-2xl bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold text-sm sm:text-base transition flex items-center justify-between">
+            <span>どちらかといえばBに近い</span>
+            <span class="text-xs opacity-70">＋</span>
+          </button>
+          <button onclick="answerQuestion(0)" class="w-full py-3.5 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-sm sm:text-base shadow-sm transition flex items-center justify-between">
+            <span>Bにとても当てはまる</span>
+            <span class="text-xs opacity-80">＋＋</span>
+          </button>
+        </div>
+
+        <!-- 戻るボタン -->
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+          <button id="prevBtn" onclick="prevQuestion()" class="text-xs sm:text-sm font-bold text-slate-500 hover:text-slate-800 disabled:opacity-30 transition">
+            ← 前の質問に戻る
+          </button>
+          <button onclick="goHome()" class="text-xs font-bold text-slate-400 hover:text-slate-600">
+            トップへ戻る
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 診断結果画面 -->
+    <section id="resultScreen" class="hidden fade-in space-y-6">
+
+      <!-- 【主役】セクション1：パーセンテージ連動 桜李祭おすすめ部署TOP3 -->
+      <div class="bg-white rounded-3xl p-6 sm:p-9 card-shadow border border-pink-100 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span id="resultRoleBadge" class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">
+            🎪 一般・イベント好きモード
+          </span>
+          <span id="resultCourseBadge" class="px-3 py-1 rounded-full bg-pink-50 text-pink-600 text-xs font-bold">
+            全12問コース
+          </span>
+        </div>
+
+        <!-- 第1候補ハイライトバナー -->
+        <div id="heroDeptBanner" class="p-5 sm:p-7 rounded-2xl bg-gradient-to-br from-pink-50 via-rose-50/70 to-amber-50/50 border-2 border-pink-300 text-center">
+          <!-- JSで動的生成 -->
+        </div>
+
+        <div>
+          <h3 id="deptSectionHeading" class="text-lg sm:text-xl font-black text-slate-900">
+            🌸 あなたの行動バランスに合う部署 TOP3
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            4つの指標のパーセンテージ比率から、全21部署との相性をリアルタイム計算しています。
+          </p>
+        </div>
+
+        <div id="topDeptsContainer" class="space-y-3.5"></div>
+
+        <!-- おすすめ兼任プロジェクト -->
+        <div class="pt-4 border-t border-slate-100">
+          <div class="text-xs font-black text-indigo-600 mb-2">✨ 局を超えて参加できる！おすすめ兼任プロジェクト</div>
+          <div id="topProjectCard" class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200"></div>
+        </div>
+      </div>
+
+      <!-- 【根拠・性格分析】セクション2：4軸パーセンテージ＆お祭り行動スタイル -->
+      <div class="bg-white rounded-3xl p-6 sm:p-9 card-shadow border border-pink-100 space-y-6">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-black mb-2">
+            📊 マッチングの根拠｜あなたのMBTI風 行動スタイル分析
+          </span>
+          <div class="flex flex-wrap items-center gap-3 mt-1">
+            <span id="resultEmoji" class="text-4xl">✨</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full sakura-gradient text-white font-black text-xs tracking-widest" id="resultCode">
+                  PCLS
+                </span>
+                <h3 id="resultTitle" class="text-xl sm:text-2xl font-black text-slate-900">
+                  スタイル名
+                </h3>
+              </div>
+              <p id="resultCatch" class="text-xs sm:text-sm font-bold text-pink-600 mt-0.5">
+                キャッチコピー
+              </p>
+            </div>
+          </div>
+          <p id="resultDesc" class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 sm:p-5 rounded-2xl mt-4">
+            解説文
+          </p>
+        </div>
+
+        <!-- 4軸パーセンテージバー -->
+        <div class="pt-4 border-t border-slate-100 space-y-4">
+          <h4 class="text-sm font-black text-slate-800">4つの指標のパーセンテージ比率</h4>
+          <div id="axisBarsContainer" class="space-y-4"></div>
+        </div>
+      </div>
+
+      <!-- セクション3：リアルタイム・バランス変化シミュレーター -->
+      <div class="bg-white rounded-3xl p-6 sm:p-9 card-shadow border border-slate-200 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-black">INTERACTIVE SIMULATOR</span>
+            <h3 class="text-lg sm:text-xl font-black text-slate-900 mt-1">🎚️ パーセンテージ変化シミュレーター</h3>
+          </div>
+          <button onclick="resetSimulator()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition">
+            診断結果の値に戻す
+          </button>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-600">
+          スライダーを動かして4つのパーセンテージを変えると、一番上の<strong>おすすめ部署TOP3・適合度・行動スタイル</strong>がリアルタイムで入れ替わります！
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="flex justify-between text-xs font-black mb-1.5">
+              <span class="text-pink-600">P 表舞台 <span id="simPVal">50</span>%</span>
+              <span class="text-slate-500">B 裏方 <span id="simBVal">50</span>%</span>
+            </div>
+            <input type="range" id="simP" min="0" max="100" value="50" oninput="onSimulate()" />
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="flex justify-between text-xs font-black mb-1.5">
+              <span class="text-amber-600">C 創造 <span id="simCVal">50</span>%</span>
+              <span class="text-slate-500">O 運営 <span id="simOVal">50</span>%</span>
+            </div>
+            <input type="range" id="simC" min="0" max="100" value="50" oninput="onSimulate()" />
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="flex justify-between text-xs font-black mb-1.5">
+              <span class="text-sky-600">L 論理 <span id="simLVal">50</span>%</span>
+              <span class="text-slate-500">E 熱量 <span id="simEVal">50</span>%</span>
+            </div>
+            <input type="range" id="simL" min="0" max="100" value="50" oninput="onSimulate()" />
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="flex justify-between text-xs font-black mb-1.5">
+              <span class="text-emerald-600">S 計画 <span id="simSVal">50</span>%</span>
+              <span class="text-slate-500">F 瞬発 <span id="simFVal">50</span>%</span>
+            </div>
+            <input type="range" id="simS" min="0" max="100" value="50" oninput="onSimulate()" />
+          </div>
+        </div>
+      </div>
+
+      <!-- アクションボタン -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button onclick="copyShareText()" class="flex-1 py-4 px-6 rounded-2xl sakura-gradient text-white font-black text-sm sm:text-base shadow-md hover:opacity-95 transition">
+          📋 診断結果をコピーしてシェア
+        </button>
+        <button onclick="goHome()" class="py-4 px-6 rounded-2xl bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-bold text-sm sm:text-base transition">
+          🔄 もう一度診断する
+        </button>
+      </div>
+      <p id="copyToast" class="hidden text-center text-xs font-bold text-emerald-600">
+        ✅ クリップボードにコピーしました！LINEやXに貼り付けてシェアしよう！
+      </p>
+    </section>
+
+  </main>
+
+  <!-- 全21部署＆3プロジェクト一覧モーダル -->
+  <div id="deptModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+      <div class="px-5 sm:px-7 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-black text-pink-500 tracking-wider">OURISAI ORGANIZATION</span>
+          <h3 class="text-lg sm:text-xl font-black text-slate-900">桜李祭 全21部署＆3プロジェクト一覧</h3>
+        </div>
+        <button onclick="closeDeptModal()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-lg flex items-center justify-center">
+          ✕
+        </button>
+      </div>
+
+      <!-- 縦幅・余白を拡張した局別カテゴリーフィルター -->
+      <div id="deptFilterBar" class="p-4 sm:p-5 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-3">
+        <!-- JSで生成 -->
+      </div>
+
+      <div id="deptListContainer" class="p-5 sm:p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <!-- JSで生成 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 16パターンの行動スタイル一覧モーダル -->
+  <div id="typesModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+      <div class="px-5 sm:px-7 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-black text-pink-500 tracking-wider">4-AXIS BEHAVIOR PATTERNS</span>
+          <h3 class="text-lg sm:text-xl font-black text-slate-900">お祭り・チーム行動スタイル（4軸×16パターン）</h3>
+        </div>
+        <button onclick="closeTypesModal()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-lg flex items-center justify-center">
+          ✕
+        </button>
+      </div>
+      <div id="typesListContainer" class="p-5 sm:p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <!-- JSで生成 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. 桜李祭 全21部署＆3プロジェクトデータ
+    // ==========================================
+    const DEPARTMENTS = [
+      // --- 編集広報局（5部署） ---
+      {
+        id: 'kikakukoho',
+        name: '企画広報部署',
+        short: '企画広報',
+        bureau: '編集広報局',
+        isProject: false,
+        desc: 'スタンプラリーなどの企画を通して来場者に桜李祭の魅力を発信し、参加型のPRを展開します。',
+        vec: { P: 82, C: 75, L: 45, S: 60 },
+        weights: { P: 1.4, C: 1.3, L: 0.8, S: 1.0 }
+      },
+      {
+        id: 'koho',
+        name: '広報部署',
+        short: '広報',
+        bureau: '編集広報局',
+        isProject: false,
+        desc: '公式SNS（X・Instagram・Facebook）の運用を中心に、学内外に向けたタイムリーな宣伝活動を担います。',
+        vec: { P: 85, C: 68, L: 50, S: 55 },
+        weights: { P: 1.5, C: 1.1, L: 0.8, S: 1.0 }
+      },
+      {
+        id: 'shuppan',
+        name: '出版部署',
+        short: '出版',
+        bureau: '編集広報局',
+        isProject: false,
+        desc: '公式パンフレットやポスター、配布用ビラの企画・構成・デザイン・入稿作業を専門に行います。',
+        vec: { P: 22, C: 90, L: 60, S: 88 },
+        weights: { P: 1.3, C: 1.6, L: 0.9, S: 1.4 }
+      },
+      {
+        id: 'haishin',
+        name: '配信部署',
+        short: '配信',
+        bureau: '編集広報局',
+        isProject: false,
+        desc: 'YouTubeやTikTokなどの公式SNSを活用した映像配信や、他部署と連携したPR動画制作を行います。',
+        vec: { P: 45, C: 88, L: 48, S: 42 },
+        weights: { P: 0.9, C: 1.6, L: 0.8, S: 1.2 }
+      },
+      {
+        id: 'kyosan',
+        name: '協賛部署',
+        short: '協賛',
+        bureau: '編集広報局',
+        isProject: false,
+        desc: '企業や地域店舗から、桜李祭の活動費や企画景品となる協賛金・協賛品を集める交渉を行います。',
+        vec: { P: 62, C: 30, L: 90, S: 85 },
+        weights: { P: 1.0, C: 1.1, L: 1.6, S: 1.4 }
+      },
+
+      // --- 企画局（8部署） ---
+      {
+        id: 'owarai',
+        name: 'お笑いライブ部署',
+        short: 'お笑い',
+        bureau: '企画局',
+        isProject: false,
+        desc: 'プロの芸人を招致し、事前の出演交渉から当日のステージ進行・MC、ライブ終了後の物販まで担当します。',
+        vec: { P: 88, C: 58, L: 45, S: 45 },
+        weights: { P: 1.5, C: 1.0, L: 0.9, S: 1.1 }
+      },
+      {
+        id: 'gaigesu',
+        name: '外部ゲスト部署',
+        short: '外ゲス',
+        bureau: '企画局',
+        isProject: false,
+        desc: '著名人（声優やタレントなど）を招致し、トークショー等を企画。当日のMCや観覧チケット管理も担います。',
+        vec: { P: 80, C: 55, L: 68, S: 72 },
+        weights: { P: 1.4, C: 0.9, L: 1.2, S: 1.2 }
+      },
+      {
+        id: 'procon',
+        name: 'プロコンサート部署',
+        short: 'プロコン',
+        bureau: '企画局',
+        isProject: false,
+        desc: 'バンドや著名アーティストを招致してライブを企画・運営。プロダクション折衝やチケット販売・転売対策も行います。',
+        vec: { P: 70, C: 58, L: 75, S: 74 },
+        weights: { P: 1.2, C: 1.0, L: 1.3, S: 1.2 }
+      },
+      {
+        id: 'gakusute',
+        name: '学生総合ステージ部署',
+        short: '学ステ',
+        bureau: '企画局',
+        isProject: false,
+        desc: '部活やサークル等のパフォーマンスステージを企画・進行。学生MCとして会場全体を熱く盛り上げます。',
+        vec: { P: 90, C: 52, L: 38, S: 38 },
+        weights: { P: 1.6, C: 0.9, L: 1.0, S: 1.2 }
+      },
+      {
+        id: 'kosaku',
+        name: '工作部署',
+        short: '工作',
+        bureau: '企画局',
+        isProject: false,
+        desc: '子どもから大人まで気軽に参加できる、ものづくり体験教室を企画・準備・運営します。',
+        vec: { P: 55, C: 86, L: 42, S: 72 },
+        weights: { P: 0.9, C: 1.5, L: 0.9, S: 1.1 }
+      },
+      {
+        id: 'ennichi',
+        name: '縁日部署',
+        short: '縁日',
+        bureau: '企画局',
+        isProject: false,
+        desc: '射的や輪投げなど、来場者がお祭り気分で楽しめるゲーム企画の制作、空間装飾、当日運営を行います。',
+        vec: { P: 74, C: 78, L: 32, S: 45 },
+        weights: { P: 1.2, C: 1.3, L: 1.1, S: 1.0 }
+      },
+      {
+        id: 'obake',
+        name: 'おばけ部署',
+        short: 'おばけ',
+        bureau: '企画局',
+        isProject: false,
+        desc: 'お化け屋敷のコンセプト設計、ルート構築、大道具・小道具の制作から当日の脅かし役まで一貫して手作りします。',
+        vec: { P: 42, C: 95, L: 30, S: 52 },
+        weights: { P: 0.9, C: 1.7, L: 1.1, S: 1.0 }
+      },
+      {
+        id: 'bingo',
+        name: 'ビンゴ部署',
+        short: 'ビンゴ',
+        bureau: '企画局',
+        isProject: false,
+        desc: '学生MCとして来場者参加型の大型ビンゴ大会を進行し、豪華景品とともに会場の一体感を作ります。',
+        vec: { P: 92, C: 45, L: 35, S: 35 },
+        weights: { P: 1.6, C: 0.9, L: 1.0, S: 1.2 }
+      },
+
+      // --- 総務局（6部署） ---
+      {
+        id: 'okunai',
+        name: '屋内部署',
+        short: '屋内',
+        bureau: '総務局',
+        isProject: false,
+        desc: '学内教室の割り当てや、屋内企画を出店する団体の管理、当日の巡回・運営サポートを行います。',
+        vec: { P: 35, C: 25, L: 78, S: 76 },
+        weights: { P: 1.1, C: 1.2, L: 1.3, S: 1.2 }
+      },
+      {
+        id: 'okugai',
+        name: '屋外部署',
+        short: '屋外',
+        bureau: '総務局',
+        isProject: false,
+        desc: '屋外テントの設営や模擬店出店団体の配置・管理、屋外エリア全体の運営統括と安全管理を行います。',
+        vec: { P: 48, C: 28, L: 72, S: 36 },
+        weights: { P: 0.9, C: 1.2, L: 1.2, S: 1.4 }
+      },
+      {
+        id: 'bihin',
+        name: '備品部署',
+        short: '備品',
+        bureau: '総務局',
+        isProject: false,
+        desc: '各企画や出店団体が必要とする机・椅子・機材などの備品調達、貸出管理、返却チェックを徹底します。',
+        vec: { P: 24, C: 22, L: 84, S: 82 },
+        weights: { P: 1.2, C: 1.2, L: 1.4, S: 1.3 }
+      },
+      {
+        id: 'hokenjo',
+        name: '保健所部署',
+        short: '保健所',
+        bureau: '総務局',
+        isProject: false,
+        desc: '飲食物を扱う出店団体への衛生指導、保健所への申請手続き、本祭当日の食品衛生・安全管理を専門に行います。',
+        vec: { P: 20, C: 20, L: 94, S: 92 },
+        weights: { P: 1.2, C: 1.2, L: 1.6, S: 1.5 }
+      },
+      {
+        id: 'soshoku',
+        name: '装飾部署',
+        short: '装飾',
+        bureau: '総務局',
+        isProject: false,
+        desc: 'その年のテーマに合わせ、明々館1階ラウンジのガラス張り部分などの学内装飾を制作・設置し空間を演出します。',
+        vec: { P: 25, C: 94, L: 36, S: 74 },
+        weights: { P: 1.2, C: 1.7, L: 1.0, S: 1.2 }
+      },
+      {
+        id: 'keibi',
+        name: '警備部署',
+        short: '警備',
+        bureau: '総務局',
+        isProject: false,
+        desc: '実行委員全体の警備シフトを組み、学内巡回や自転車・駐輪場誘導など、安全安心な会場づくりを統括します。',
+        vec: { P: 52, C: 18, L: 82, S: 28 },
+        weights: { P: 0.9, C: 1.3, L: 1.3, S: 1.6 }
+      },
+
+      // --- 財務局（2部署） ---
+      {
+        id: 'kaikei',
+        name: '会計部署',
+        short: '会計',
+        bureau: '財務局',
+        isProject: false,
+        desc: '実行委員会全体の予算編成、各局・各部署への資金分配、備品購入の精算や決算など厳密な金銭管理を行います。',
+        vec: { P: 16, C: 18, L: 96, S: 94 },
+        weights: { P: 1.4, C: 1.3, L: 1.7, S: 1.6 }
+      },
+      {
+        id: 'shogai',
+        name: '渉外部署',
+        short: '渉外',
+        bureau: '財務局',
+        isProject: false,
+        desc: '境川クリーンアップ作戦や地域の夏祭り・フェスタなど様々なボランティアに参加し、地域交流を目的に活動します。',
+        vec: { P: 76, C: 36, L: 54, S: 64 },
+        weights: { P: 1.3, C: 1.0, L: 0.9, S: 1.0 }
+      },
+
+      // --- プロジェクト（3プロジェクト） ---
+      {
+        id: 'pj_hp',
+        name: 'HP（ホームページ）プロジェクト',
+        short: 'HP',
+        bureau: 'プロジェクト',
+        isProject: true,
+        parentBureau: '編集広報局管轄（全委員参加可）',
+        desc: '桜李祭公式ウェブサイトの構築、デザイン更新、アクセス解析などを行い、デジタル面から来場者を案内します。',
+        vec: { P: 25, C: 82, L: 84, S: 78 },
+        weights: { P: 1.2, C: 1.4, L: 1.4, S: 1.2 }
+      },
+      {
+        id: 'pj_zenya',
+        name: '前夜祭プロジェクト',
+        short: '前夜',
+        bureau: 'プロジェクト',
+        isProject: true,
+        parentBureau: '企画局管轄（全委員参加可）',
+        desc: '前夜祭ステージ係・エンディングステージ係・プレ学係・映像・メモリーツリー係（ミクツリー）の4係に分かれ、祭りの開幕とフィナーレを創ります。',
+        vec: { P: 78, C: 82, L: 28, S: 44 },
+        weights: { P: 1.3, C: 1.4, L: 1.2, S: 1.1 }
+      },
+      {
+        id: 'pj_hanabi',
+        name: '花火プロジェクト',
+        short: '花火',
+        bureau: 'プロジェクト',
+        isProject: true,
+        parentBureau: '総務局管轄（全委員参加可）',
+        desc: '桜李祭のフィナーレを飾る打ち上げ花火の企画・業者手配およびクラウドファンディング運営を行います。',
+        vec: { P: 45, C: 65, L: 76, S: 88 },
+        weights: { P: 0.9, C: 1.1, L: 1.3, S: 1.5 }
+      }
+    ];
+
+    // ==========================================
+    // 2. 4軸×16パターンの行動スタイル定義
+    // ==========================================
+    const TYPE_PROFILES = {
+      PCLS: {
+        title: '戦略的ショーメーカー',
+        emoji: '🎯',
+        catch: 'データと企画力でステージを成功に導くプロデューサー',
+        desc: '人前に立つ華やかさと、冷静な計画設計力を兼ね備えたスタイル。盛り上げるだけでなく「どうすれば一番伝わるか・成功するか」を逆算して動けるため、大型イベントの企画進行や交渉の場で頼りにされます。'
+      },
+      PCLF: {
+        title: '瞬発力のムードアナリスト',
+        emoji: '⚡',
+        catch: '現場の空気を一瞬で読み取り最適解を出す司令塔',
+        desc: '発信力とアイデア力がありながら、状況を論理的に判断して即座に行動できるスタイル。トラブルが起きても「今こう動けば面白くなる！」と機転を利かせて場をまとめる力があります。'
+      },
+      PCES: {
+        title: '王道エンターテイナー',
+        emoji: '🌟',
+        catch: 'ワクワクする仕掛けを丁寧に作り込む人気者',
+        desc: '「みんなを楽しませたい！」という熱い想いを、コツコツとした準備で形にできるスタイル。表舞台で輝くことも、アイデアを練り上げることも大好きで、周囲を巻き込む明るいエネルギーを持っています。'
+      },
+      PCEF: {
+        title: 'お祭りライブパフォーマー',
+        emoji: '🎉',
+        catch: 'その場の熱量を最高潮に引き上げる天性の盛り上げ役',
+        desc: '直感と行動力、そして圧倒的なライブ感で会場を一つにするスタイル。予定調和にとらわれず、来場者や仲間の笑顔を引き出す天才で、お祭り本番で最も輝く存在です。'
+      },
+      POLS: {
+        title: 'フロント統括ディレクター',
+        emoji: '📋',
+        catch: '表舞台の進行とルール管理を完璧にこなす信頼の要',
+        desc: '対外的なコミュニケーション力と、論理的・計画的な運営力を併せ持つスタイル。関係者との折衝やスケジュール管理をきっちりこなしつつ、現場の顔としても安心感を与えます。'
+      },
+      POLF: {
+        title: '現場対応のスペシャリスト',
+        emoji: '🚨',
+        catch: 'どんなハプニングも冷静にさばく最前線のリーダー',
+        desc: '人と関わるフットワークの軽さと、状況判断の速さが光るスタイル。現場の最前線で変化にすぐ気づき、的確な指示や誘導で全体の秩序を守り抜きます。'
+      },
+      POES: {
+        title: '気配りのホスピタリティリーダー',
+        emoji: '🤝',
+        catch: '人と人をつなぎ、温かいチームを作る調整役',
+        desc: '相手の気持ちに寄り添う温かさと、計画的に物事を進める誠実さを持つスタイル。出演者や参加者、メンバー全員が気持ちよく動ける環境を丁寧に整えます。'
+      },
+      POEF: {
+        title: '太陽のコミュニティビルダー',
+        emoji: '☀️',
+        catch: '持ち前の明るさとフットワークで現場を動かす潤滑油',
+        desc: '誰とでもすぐに打ち解け、困っている人がいれば真っ先に駆けつける行動派。理屈よりも「今、目の前の人のために動こう！」という熱量で現場に活気をもたらします。'
+      },
+      BCLS: {
+        title: '緻密なクリエイティブ設計士',
+        emoji: '📐',
+        catch: 'クオリティと締切を両立させる職人気質の制作者',
+        desc: '裏方から作品や仕組みを作り上げることに喜びを感じるスタイル。独創的なアイデアを論理的な構成と計画的なスケジュールで形にし、完成度の高いアウトプットを生み出します。'
+      },
+      BCLF: {
+        title: 'アイデア実装のテクニシャン',
+        emoji: '🎬',
+        catch: 'ひらめきをスピーディに形にするマルチクリエイター',
+        desc: '自由な発想力と合理的な判断力を持ち、変化に合わせて柔軟に制作・改善できるスタイル。撮影や編集、空間づくりなど、現場の空気を取り入れながらクリエイティブに仕上げます。'
+      },
+      BCES: {
+        title: '世界観のクラフトマスター',
+        emoji: '🎨',
+        catch: 'こだわりと愛情を込めて空間・作品を創り上げる芸術家',
+        desc: '人の心を動かす世界観や手作り体験を、コツコツと形にするのが得意なスタイル。表に出るよりも「自分が作ったもので誰かが感動してくれる瞬間」に最高のやりがいを感じます。'
+      },
+      BCEF: {
+        title: '感性のサプライズクリエイター',
+        emoji: '👻',
+        catch: '自由な発想と熱量で驚きを仕掛ける秘密兵器',
+        desc: '感情豊かなアイデアと瞬発的な行動力で、ユニークな空間や体験を生み出すスタイル。仲間と一緒にワイワイ手を動かしながら、予測不能な楽しさを作り出します。'
+      },
+      BOLS: {
+        title: '鉄壁のオペレーション参謀',
+        emoji: '🛡️',
+        catch: '組織の基盤・予算・安全を完璧に守り抜く守護神',
+        desc: '数字・ルール・スケジュール管理において圧倒的な信頼を誇るスタイル。目立たない裏方の仕事こそ手を抜かず、組織全体が安心して活動できる土台を築きます。'
+      },
+      BOLF: {
+        title: 'ロジカル・トラブルシューター',
+        emoji: '⚙️',
+        catch: '現場のボトルネックを瞬時に解消する実務のエース',
+        desc: '冷静な分析力と機動力を兼ね備えた裏方の要。機材の不足や動線の混雑など、現場で発生する課題を素早く見抜いて合理的に解決します。'
+      },
+      BOES: {
+        title: '縁の下の真心サポーター',
+        emoji: '🌿',
+        catch: '細やかな気配りと計画性で仲間を支える安心の存在',
+        desc: 'チーム全体の雰囲気やメンバーの頑張りを静かに見守り、計画的なサポートで支えるスタイル。あなたの丁寧な準備と優しさが、みんなの原動力になります。'
+      },
+      BOEF: {
+        title: '全力バックアップの救援隊',
+        emoji: '💪',
+        catch: '「今一番手が必要な場所」へ即座に駆けつける頼れる相棒',
+        desc: '仲間想いであたたかく、フットワーク軽く裏方を支えるスタイル。マニュアル通りの動きだけでなく、その場その場で必要なサポートを察知して行動できます。'
+      }
+    };
+
+    // ==========================================
+    // 3. ダブルバーレル排除・全40問（各軸10問）
+    //    ※12問モード時は各軸の先頭3問（計12問）を使用
+    // ==========================================
+    const QUESTIONS = [
+      // --- 軸1：立ち位置（P: 表舞台・発信 ／ B: 裏方・基盤） ---
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: '文化祭やイベントに参加するとき、よりワクワクするのは？',
+        a: 'ステージのMCや受付など、来場者と直接ふれあう役割',
+        b: '装飾づくりや機材準備など、裏側から会場を支える役割'
+      },
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: 'グループ発表やプレゼンの場面で、自然と引き受けがちなのは？',
+        a: '前に立ってスピーカーとして話す役',
+        b: 'スライド構成や原稿・資料を整える役'
+      },
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: 'SNSや広報活動に関わるなら、どちらが自分に合っていますか？',
+        a: '表に出て魅力をPRしたり、企画で人を呼び込んだりすること',
+        b: '裏でデザインやデータ管理を整え、発信の土台を作ること'
+      },
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: '初対面の人が多い交流の場に入ったとき、あなたの行動は？',
+        a: '自分から声をかけて会話の輪を広げることが多い',
+        b: 'まずは周りの様子を見ながら、落ち着いたタイミングで話す'
+      },
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: 'チームで大きな達成感を感じるのはどちらの瞬間ですか？',
+        a: '自分の言葉や進行で、目の前の人が笑顔になった瞬間',
+        b: '自分の準備や仕組みのおかげで、全体がスムーズに回った瞬間'
+      },
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: '集合写真や記念動画を撮るとき、つい取りがちなポジションは？',
+        a: '前列や真ん中あたりでポーズを決める側',
+        b: '端の方で支えたり、カメラマン役を買って出たりする側'
+      },
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: 'お店やブースを運営するなら、どちらの担当を選びますか？',
+        a: '店頭でお客さんに声をかけて呼び込む接客担当',
+        b: 'バックヤードで在庫や備品を管理するサポート担当'
+      },
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: '会議で意見を伝えるとき、どちらのスタイルが多いですか？',
+        a: '全体に向けて発言し、議論を前に進める',
+        b: '少人数やチャットで丁寧に意見を補足・整理する'
+      },
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: 'イベント終了後、どんな褒め言葉を言われると一番嬉しいですか？',
+        a: '「進行や接客が最高で、すごく楽しかった！」',
+        b: '「裏方の準備が完璧だったから、安心して楽しめた！」'
+      },
+      {
+        axis: 'P',
+        axisLabel: '指標1：立ち位置（表舞台 vs 裏方）',
+        situation: '新しいプロジェクトが立ち上がったとき、興味が湧くのは？',
+        a: '外部の人や地域・ゲストと直接関わる窓口の仕事',
+        b: 'チーム内のルールや設備・予算をしっかり固める仕事'
+      },
+
+      // --- 軸2：得意な武器（C: クリエイティブ・創造 ／ O: オペレーション・運営） ---
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: 'ゼロから企画を立てるとき、最初に頭の中に浮かぶのは？',
+        a: '「こんなテーマやデザインにしたら面白そう！」という世界観',
+        b: '「何人必要で、どう動線を作れば回るか？」という運営体制'
+      },
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: '学園祭の出し物を準備するなら、どちらの作業が好きですか？',
+        a: 'ポスター・動画・装飾・小道具などのモノづくり',
+        b: 'シフト表の作成や備品リスト・会場配置の整理'
+      },
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: '既存のやり方に対して、あなたがよく考えることは？',
+        a: '「もっと新しい工夫やオリジナル要素を入れられないか？」',
+        b: '「もっと無駄をなくして安全・確実に回せないか？」'
+      },
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: '文化祭でブースを見て回るとき、つい注目してしまうのは？',
+        a: '装飾のクオリティや企画アイデアのユニークさ',
+        b: '待機列のさばき方や案内表示の分かりやすさ'
+      },
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: '自由に使える時間が2時間あったら、どちらに魅力を感じますか？',
+        a: 'イラストや動画、工作など何かを形にする作業',
+        b: '予定やタスク、持ち物をスッキリ整理する作業'
+      },
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: 'チームの中で「頼りになる！」と思われたいポイントは？',
+        a: 'ユニークな企画やセンスある制作物を生み出す発想力',
+        b: '複雑な調整や管理をミスなくやり遂げる実務力'
+      },
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: 'マニュアルやテンプレートがある作業に対してどう感じますか？',
+        a: '自分なりのアレンジを加えたくなることが多い',
+        b: '手順通りに正確に再現できると安心感がある'
+      },
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: '友達と旅行の計画を立てるとき、あなたが担当したいのは？',
+        a: '「映えるスポットや体験アクティビティ」を探すこと',
+        b: '「移動時間や予約、予算のスケジュール」を組むこと'
+      },
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: 'イベントのパンフレットを作るなら、どちらの役割がいいですか？',
+        a: '表紙デザインや特集ページの企画アイデア出し',
+        b: '全団体の掲載情報チェックや進行スケジュール管理'
+      },
+      {
+        axis: 'C',
+        axisLabel: '指標2：得意な武器（創造 vs 運営）',
+        situation: '何かを改善するとき、より重視するアプローチは？',
+        a: '魅力や楽しさをプラスして価値を高めること',
+        b: 'ルールや導線を整えてトラブルを減らすこと'
+      },
+
+      // --- 軸3：判断基準（L: ロジック・実務 ／ E: エモーション・熱量） ---
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: '企画を採用するかどうか迷ったとき、決め手になるのは？',
+        a: '予算・実現可能性・安全面の根拠がしっかりしているか',
+        b: '「絶対にやりたい！」というメンバーの熱量やワクワク感'
+      },
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: '仲間が悩んで相談してきたとき、最初にとりやすい反応は？',
+        a: '状況や原因を整理して、具体的な解決策を一緒に考える',
+        b: 'まず気持ちに共感して、寄り添いながら励ます'
+      },
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: '外部の人や企業と交渉する場面で、意識したいのは？',
+        a: '数字やメリットを明確に示して納得してもらうこと',
+        b: '誠意や熱い想いを伝えて心を動かしてもらうこと'
+      },
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: 'イベントのルールや申請手続きについて、どう捉えていますか？',
+        a: '全体を守るために厳密にチェックすべき重要な基準',
+        b: '必要なことではあるが、現場の柔軟さも大切にしたい'
+      },
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: 'チームのモチベーションを高めるなら、どちらが効果的だと思いますか？',
+        a: '目標数値や役割分担を明確にして達成感を共有すること',
+        b: '掛け声やイベントで一体感を作り、感情を盛り上げること'
+      },
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: '買い物や予算配分をするとき、重視するのはどちらですか？',
+        a: '費用対効果や明細の正確さをしっかり計算すること',
+        b: '多少コストがかかっても、満足度や特別感が出ること'
+      },
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: '映画やライブを観て感動したあと、友達と話す内容は？',
+        a: '「演出の構成や伏線がすごかった」という分析トーク',
+        b: '「あのシーン最高すぎて鳥肌立った！」という感想トーク'
+      },
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: '意見が対立したとき、納得しやすいのはどちらの意見ですか？',
+        a: 'データや過去の事例に基づいた客観的な意見',
+        b: '参加者や仲間の気持ちを第一に考えた温かい意見'
+      },
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: '成功の基準を1つだけ選ぶとしたら、どちらに近いですか？',
+        a: '事故や赤字がなく、計画通りに完遂できたこと',
+        b: '関わった全員が「最高に楽しかった」と笑顔で終われたこと'
+      },
+      {
+        axis: 'L',
+        axisLabel: '指標3：判断基準（論理 vs 熱量）',
+        situation: '新しいツールや仕組みを導入するとき、気になるのは？',
+        a: '管理の手間が減るか、ミスを防げるかという合理性',
+        b: 'みんなが楽しく使えそうか、親しみやすいかという感覚'
+      },
+
+      // --- 軸4：動き方（S: 計画・コツコツ ／ F: 瞬発力・現場対応） ---
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: '締切があるタスクに取り組むとき、あなたのペースは？',
+        a: '逆算してスケジュールを組み、余裕を持って早めに終わらせる',
+        b: '締切が近づいたときの集中力と勢いで一気に仕上げる'
+      },
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: 'イベント当日、予定外のトラブルが起きたときの反応は？',
+        a: '「事前にもっと対策しておけば…」と反省しつつマニュアルを確認する',
+        b: '「よし、今できるベストな対応をしよう！」と即座に動く'
+      },
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: '長期プロジェクトと短期決戦イベント、どちらが合っていますか？',
+        a: '数ヶ月かけてコツコツ準備を積み上げる長期プロジェクト',
+        b: '当日のライブ感やスピード感の中で動く短期決戦'
+      },
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: '前日の夜、明日のイベントに向けてとる行動は？',
+        a: '持ち物やタイムスケジュールを何度も見直して万全にする',
+        b: '細かいことは当日現場で調整しようと早めに切り替える'
+      },
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: '決まっていた予定が急に変わったとき、どう感じますか？',
+        a: '計画が崩れると少しストレスを感じ、立て直したくなる',
+        b: '「それもアリ！」と気分を切り替えて柔軟に楽しめる'
+      },
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: '連絡やリマインドのやり方で、自分に近いのは？',
+        a: '早めに日程を決めて、前もって確認連絡を入れる',
+        b: '状況を見ながら、その都度リアルタイムで連絡を取り合う'
+      },
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: '作業を進めるときのスタイルはどちらですか？',
+        a: '全体の完成図と手順を決めてから順番に着手する',
+        b: 'まず手を動かしてみて、やりながら軌道修正する'
+      },
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: '「一番実力を発揮できる場面」はどちらですか？',
+        a: '事前の申請・入稿・手配を漏れなく完璧に仕上げる場面',
+        b: '当日の混雑誘導やステージ進行など臨機応変さが求められる場面'
+      },
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: 'ノートやメモの取り方に近いのはどちらですか？',
+        a: '項目ごとに整理して、後から見返しやすい形で残す',
+        b: '思いついたことや要点をその場でパッと書き留める'
+      },
+      {
+        axis: 'S',
+        axisLabel: '指標4：動き方（計画 vs 瞬発）',
+        situation: '学園祭の2日間を過ごすなら、どちらの働き方がワクワクしますか？',
+        a: '事前準備の成果が計画通りに形になるのを見守ること',
+        b: '無線や連絡を受けながら現場を駆け回って対応すること'
+      }
+    ];
+
+    // ==========================================
+    // 4. 状態管理
+    // ==========================================
+    let selectedRole = 'general';
+    let quizLength = 12;
+    let activeQuestions = [];
+    let currentIndex = 0;
+    let answers = [];
+    let baseScores = { P: 50, C: 50, L: 50, S: 50 };
+    let currentScores = { P: 50, C: 50, L: 50, S: 50 };
+    let currentDeptFilter = 'ALL';
+
+    const ROLE_LABELS = {
+      general: '🎪 一般・イベント好きモード',
+      obirin: '🌸 桜美林生・新入生モード',
+      member: '🔥 現役 桜李祭実行委員モード'
+    };
+
+    // ==========================================
+    // 5. 画面遷移・診断ロジック
+    // ==========================================
+    function selectRole(role) {
+      selectedRole = role;
+      document.querySelectorAll('.role-btn').forEach(btn => {
+        if (btn.dataset.role === role) {
+          btn.classList.remove('border-slate-200', 'bg-white');
+          btn.classList.add('border-pink-500', 'bg-pink-50/70');
+        } else {
+          btn.classList.remove('border-pink-500', 'bg-pink-50/70');
+          btn.classList.add('border-slate-200', 'bg-white');
+        }
+      });
+    }
+
+    function startQuiz(length) {
+      quizLength = length;
+      const perAxis = length / 4; // 3問 or 10問
+      const pQs = QUESTIONS.filter(q => q.axis === 'P').slice(0, perAxis);
+      const cQs = QUESTIONS.filter(q => q.axis === 'C').slice(0, perAxis);
+      const lQs = QUESTIONS.filter(q => q.axis === 'L').slice(0, perAxis);
+      const sQs = QUESTIONS.filter(q => q.axis === 'S').slice(0, perAxis);
+
+      activeQuestions = [];
+      for (let i = 0; i < perAxis; i++) {
+        activeQuestions.push(pQs[i], cQs[i], lQs[i], sQs[i]);
+      }
+
+      currentIndex = 0;
+      answers = new Array(activeQuestions.length).fill(null);
+
+      document.getElementById('homeScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('quizScreen').classList.remove('hidden');
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderQuestion() {
+      const q = activeQuestions[currentIndex];
+      const total = activeQuestions.length;
+      const pct = Math.round(((currentIndex + 1) / total) * 100);
+
+      document.getElementById('quizAxisBadge').textContent = q.axisLabel;
+      document.getElementById('quizProgressText').textContent = `${currentIndex + 1} / ${total}`;
+      document.getElementById('quizProgressBar').style.width = `${pct}%`;
+      document.getElementById('questionNumber').textContent = currentIndex + 1;
+      document.getElementById('questionSituation').textContent = q.situation;
+      document.getElementById('optionAText').textContent = q.a;
+      document.getElementById('optionBText').textContent = q.b;
+      document.getElementById('prevBtn').disabled = currentIndex === 0;
+    }
+
+    function answerQuestion(val) {
+      answers[currentIndex] = val;
+      if (currentIndex < activeQuestions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        calculateAndShowResult();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    }
+
+    function calculateAndShowResult() {
+      const sums = { P: 0, C: 0, L: 0, S: 0 };
+      const counts = { P: 0, C: 0, L: 0, S: 0 };
+
+      activeQuestions.forEach((q, idx) => {
+        const val = answers[idx] !== null ? answers[idx] : 1.5;
+        sums[q.axis] += val;
+        counts[q.axis] += 3;
+      });
+
+      baseScores = {
+        P: Math.round((sums.P / counts.P) * 100),
+        C: Math.round((sums.C / counts.C) * 100),
+        L: Math.round((sums.L / counts.L) * 100),
+        S: Math.round((sums.S / counts.S) * 100)
+      };
+
+      currentScores = { ...baseScores };
+
+      document.getElementById('simP').value = currentScores.P;
+      document.getElementById('simC').value = currentScores.C;
+      document.getElementById('simL').value = currentScores.L;
+      document.getElementById('simS').value = currentScores.S;
+
+      document.getElementById('quizScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+
+      renderResultView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getTypeCode(scores) {
+      const a1 = scores.P >= 50 ? 'P' : 'B';
+      const a2 = scores.C >= 50 ? 'C' : 'O';
+      const a3 = scores.L >= 50 ? 'L' : 'E';
+      const a4 = scores.S >= 50 ? 'S' : 'F';
+      return `${a1}${a2}${a3}${a4}`;
+    }
+
+    function computeMatchScore(userScores, item) {
+      const axes = ['P', 'C', 'L', 'S'];
+      let weightedSqDiff = 0;
+      let maxWeightedSqDiff = 0;
+
+      axes.forEach(ax => {
+        const w = item.weights[ax] || 1.0;
+        const diff = userScores[ax] - item.vec[ax];
+        weightedSqDiff += w * diff * diff;
+        maxWeightedSqDiff += w * 100 * 100;
+      });
+
+      const normDist = Math.sqrt(weightedSqDiff / maxWeightedSqDiff);
+      const rawMatch = 100 - normDist * 115;
+      return Math.max(48, Math.min(99, Math.round(rawMatch)));
+    }
+
+    function renderResultView() {
+      const code = getTypeCode(currentScores);
+      const profile = TYPE_PROFILES[code];
+
+      document.getElementById('resultRoleBadge').textContent = ROLE_LABELS[selectedRole];
+      document.getElementById('resultCourseBadge').textContent = `全${quizLength}問コース`;
+
+      // 部署（21部署）ランキング算出
+      const rankedDepts = DEPARTMENTS
+        .filter(d => !d.isProject)
+        .map(d => ({ ...d, match: computeMatchScore(currentScores, d) }))
+        .sort((a, b) => b.match - a.match);
+
+      const top1 = rankedDepts[0];
+      const top3 = rankedDepts.slice(0, 3);
+
+      // 主役バナー（第1候補部署）描画
+      const roleLead = selectedRole === 'general'
+        ? 'もしあなたが桜李祭実行委員会に入ったら、一番ぴったりの部署は…'
+        : 'あなたの行動バランスに最もマッチする適性部署は…';
+
+      document.getElementById('heroDeptBanner').innerHTML = `
+        <p class="text-xs sm:text-sm font-bold text-pink-600 mb-2">${roleLead}</p>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-slate-700 text-xs font-black border border-pink-200 mb-2">
+          <span>${top1.bureau}</span>
+          <span>・</span>
+          <span class="text-pink-600">適合度 ${top1.match}%</span>
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-black text-slate-900 mb-2">
+          ${top1.name}
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+          ${top1.desc}
+        </p>
+      `;
+
+      // TOP3リスト描画
+      const rankBadges = [
+        { label: '🥇 第1候補', bg: 'bg-amber-100 text-amber-800 border-amber-300' },
+        { label: '🥈 第2候補', bg: 'bg-slate-100 text-slate-700 border-slate-300' },
+        { label: '🥉 第3候補', bg: 'bg-orange-50 text-orange-800 border-orange-200' }
+      ];
+
+      document.getElementById('topDeptsContainer').innerHTML = top3.map((dept, i) => `
+        <div class="p-4 sm:p-5 rounded-2xl border-2 ${i === 0 ? 'border-pink-300 bg-pink-50/40' : 'border-slate-200 bg-white'} transition">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-black border ${rankBadges[i].bg}">${rankBadges[i].label}</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">${dept.bureau}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-bold text-slate-500">適合度</span>
+              <span class="text-lg sm:text-xl font-black text-pink-600 ml-1">${dept.match}%</span>
+            </div>
+          </div>
+          <h4 class="text-base sm:text-lg font-black text-slate-900 mb-1">
+            ${dept.name} <span class="text-xs font-bold text-slate-400">（略称：${dept.short}）</span>
+          </h4>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${dept.desc}</p>
+        </div>
+      `).join('');
+
+      // プロジェクト（3プロジェクト）ランキング算出
+      const rankedProjects = DEPARTMENTS
+        .filter(d => d.isProject)
+        .map(d => ({ ...d, match: computeMatchScore(currentScores, d) }))
+        .sort((a, b) => b.match - a.match);
+
+      const bestPj = rankedProjects[0];
+      document.getElementById('topProjectCard').innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+          <span class="text-xs font-black text-indigo-700">${bestPj.parentBureau}</span>
+          <span class="text-sm font-black text-indigo-700">適合度 ${bestPj.match}%</span>
+        </div>
+        <h4 class="text-base font-black text-slate-900 mb-1">${bestPj.name}（略称：${bestPj.short}）</h4>
+        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">${bestPj.desc}</p>
+      `;
+
+      // 根拠セクション（行動スタイル・4軸バー）描画
+      document.getElementById('resultEmoji').textContent = profile.emoji;
+      document.getElementById('resultCode').textContent = code;
+      document.getElementById('resultTitle').textContent = profile.title;
+      document.getElementById('resultCatch').textContent = profile.catch;
+      document.getElementById('resultDesc').textContent = profile.desc;
+
+      document.getElementById('simPVal').textContent = currentScores.P;
+      document.getElementById('simBVal').textContent = 100 - currentScores.P;
+      document.getElementById('simCVal').textContent = currentScores.C;
+      document.getElementById('simOVal').textContent = 100 - currentScores.C;
+      document.getElementById('simLVal').textContent = currentScores.L;
+      document.getElementById('simEVal').textContent = 100 - currentScores.L;
+      document.getElementById('simSVal').textContent = currentScores.S;
+      document.getElementById('simFVal').textContent = 100 - currentScores.S;
+
+      const axisConfigs = [
+        { key: 'P', left: 'P 表舞台・発信', right: 'B 裏方・基盤', color: 'bg-pink-500' },
+        { key: 'C', left: 'C クリエイティブ', right: 'O オペレーション', color: 'bg-amber-500' },
+        { key: 'L', left: 'L ロジック・実務', right: 'E エモーション・熱量', color: 'bg-sky-500' },
+        { key: 'S', left: 'S 計画・コツコツ', right: 'F 瞬発・現場対応', color: 'bg-emerald-500' }
+      ];
+
+      document.getElementById('axisBarsContainer').innerHTML = axisConfigs.map(cfg => {
+        const leftPct = currentScores[cfg.key];
+        const rightPct = 100 - leftPct;
+        return `
+          <div>
+            <div class="flex justify-between text-xs font-black mb-1">
+              <span class="${leftPct >= 50 ? 'text-slate-900' : 'text-slate-400'}">${cfg.left} ${leftPct}%</span>
+              <span class="${rightPct > 50 ? 'text-slate-900' : 'text-slate-400'}">${rightPct}% ${cfg.right}</span>
+            </div>
+            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex">
+              <div class="${cfg.color} h-full transition-all duration-200" style="width: ${leftPct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function onSimulate() {
+      currentScores = {
+        P: parseInt(document.getElementById('simP').value, 10),
+        C: parseInt(document.getElementById('simC').value, 10),
+        L: parseInt(document.getElementById('simL').value, 10),
+        S: parseInt(document.getElementById('simS').value, 10)
+      };
+      renderResultView();
+    }
+
+    function resetSimulator() {
+      currentScores = { ...baseScores };
+      document.getElementById('simP').value = currentScores.P;
+      document.getElementById('simC').value = currentScores.C;
+      document.getElementById('simL').value = currentScores.L;
+      document.getElementById('simS').value = currentScores.S;
+      renderResultView();
+    }
+
+    function copyShareText() {
+      const code = getTypeCode(currentScores);
+      const profile = TYPE_PROFILES[code];
+      const rankedDepts = DEPARTMENTS
+        .filter(d => !d.isProject)
+        .map(d => ({ ...d, match: computeMatchScore(currentScores, d) }))
+        .sort((a, b) => b.match - a.match);
+
+      const text = `【桜李祭版 MBTI｜適性部署診断】\n🌸 おすすめ部署1位：${rankedDepts[0].name}（適合度${rankedDepts[0].match}%）\n✨ 行動スタイル：${profile.title}（${code}）${profile.emoji}\n📊 比率：表舞台${currentScores.P}% / 創造${currentScores.C}% / 論理${currentScores.L}% / 計画${currentScores.S}%\n\n#桜李祭 #桜美林大学 #桜李祭版MBTI #適性部署診断`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('copyToast');
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3500);
+      });
+    }
+
+    function goHome() {
+      document.getElementById('quizScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('homeScreen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================
+    // 6. モーダル制御（全21部署＆3PJ一覧 / 行動スタイル一覧）
+    // ==========================================
+    function openDeptModal() {
+      renderDeptFilterBar();
+      renderDeptList();
+      document.getElementById('deptModal').classList.remove('hidden');
+    }
+
+    function closeDeptModal() {
+      document.getElementById('deptModal').classList.add('hidden');
+    }
+
+    function setDeptFilter(filterKey) {
+      currentDeptFilter = filterKey;
+      renderDeptFilterBar();
+      renderDeptList();
+    }
+
+    function renderDeptFilterBar() {
+      const categories = [
+        { key: 'ALL', label: `全て（${DEPARTMENTS.length}）` },
+        { key: '編集広報局', label: `編集広報局（${DEPARTMENTS.filter(d => d.bureau === '編集広報局').length}）` },
+        { key: '企画局', label: `企画局（${DEPARTMENTS.filter(d => d.bureau === '企画局').length}）` },
+        { key: '総務局', label: `総務局（${DEPARTMENTS.filter(d => d.bureau === '総務局').length}）` },
+        { key: '財務局', label: `財務局（${DEPARTMENTS.filter(d => d.bureau === '財務局').length}）` },
+        { key: 'プロジェクト', label: `プロジェクト（${DEPARTMENTS.filter(d => d.bureau === 'プロジェクト').length}）` }
+      ];
+
+      document.getElementById('deptFilterBar').innerHTML = categories.map(cat => {
+        const active = currentDeptFilter === cat.key;
+        const styleClass = active
+          ? 'bg-pink-500 text-white border-pink-600 shadow-sm'
+          : 'bg-white text-slate-700 border-slate-200 hover:border-pink-300 hover:bg-pink-50/40';
+        return `
+          <button type="button" onclick="setDeptFilter('${cat.key}')" class="dept-filter-btn ${styleClass}">
+            ${cat.label}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderDeptList() {
+      const filtered = currentDeptFilter === 'ALL'
+        ? DEPARTMENTS
+        : DEPARTMENTS.filter(d => d.bureau === currentDeptFilter);
+
+      const bureauColors = {
+        '編集広報局': 'bg-pink-50 text-pink-700 border-pink-200',
+        '企画局': 'bg-amber-50 text-amber-700 border-amber-200',
+        '総務局': 'bg-sky-50 text-sky-700 border-sky-200',
+        '財務局': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        'プロジェクト': 'bg-indigo-50 text-indigo-700 border-indigo-200'
+      };
+
+      document.getElementById('deptListContainer').innerHTML = filtered.map(d => `
+        <div class="p-4 rounded-2xl border border-slate-200 bg-white hover:border-pink-200 transition">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="px-2.5 py-1 rounded-lg text-xs font-black border ${bureauColors[d.bureau] || 'bg-slate-100'}">${d.bureau}</span>
+            <span class="text-xs font-bold text-slate-400">略称：${d.short}</span>
+          </div>
+          <h4 class="text-base font-black text-slate-900 mb-1">${d.name}</h4>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${d.desc}</p>
+        </div>
+      `).join('');
+    }
+
+    function openTypesModal() {
+      const container = document.getElementById('typesListContainer');
+      container.innerHTML = Object.entries(TYPE_PROFILES).map(([code, t]) => `
+        <div class="p-4 rounded-2xl border border-slate-200 bg-white">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-2xl">${t.emoji}</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 text-xs font-black">${code}</span>
+            <h4 class="text-sm sm:text-base font-black text-slate-900">${t.title}</h4>
+          </div>
+          <p class="text-xs font-bold text-pink-600 mb-1">${t.catch}</p>
+          <p class="text-xs text-slate-600 leading-relaxed">${t.desc}</p>
+        </div>
+      `).join('');
+      document.getElementById('typesModal').classList.remove('hidden');
+    }
+
+    function closeTypesModal() {
+      document.getElementById('typesModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
